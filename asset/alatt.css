@@ -1,0 +1,470 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #eef2ff;
+    color: #172554;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    height: 70px;
+
+    background: linear-gradient(
+        90deg,
+        #172554,
+        #4c1d95
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 45px;
+
+    color: white;
+
+    box-shadow: 0 4px 18px rgba(30, 27, 75, 0.30);
+}
+
+
+/* LOGO */
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.logo span {
+    color: #c4b5fd;
+}
+
+
+/* MENU */
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+
+    color: #ddd6fe;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.nav-menu a:hover {
+    background: rgba(255,255,255,0.12);
+
+    color: white;
+}
+
+.nav-menu a.active {
+    background: rgba(255,255,255,0.18);
+
+    color: white;
+}
+
+
+/* ADMIN */
+
+.admin {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 14px;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+
+    background: #c4b5fd;
+
+    color: #312e81;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+    max-width: 1100px;
+
+    margin: 35px auto;
+
+    padding: 0 20px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 28px;
+
+    color: #172554;
+
+    margin-bottom: 6px;
+}
+
+.header p {
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   TAMBAH
+========================= */
+
+.btn-tambah {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    background: linear-gradient(
+        90deg,
+        #172554,
+        #4c1d95
+    );
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.btn-tambah:hover {
+    opacity: 0.9;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-box {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 4px 15px rgba(30, 27, 75, 0.08);
+
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    text-align: left;
+}
+
+table th {
+    background: #eef2ff;
+
+    color: #172554;
+
+    font-weight: 700;
+}
+
+table td {
+    color: #334155;
+}
+
+
+/* =========================
+   AKSI
+========================= */
+
+.aksi {
+    white-space: nowrap;
+}
+
+
+/* EDIT */
+
+.btn-edit {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 6px;
+
+    background: #ddd6fe;
+
+    color: #4c1d95;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    font-size: 13px;
+}
+
+
+/* HAPUS */
+
+.btn-hapus {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    margin-left: 5px;
+
+    border-radius: 6px;
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   DATA KOSONG
+========================= */
+
+.kosong {
+    text-align: center;
+
+    color: #64748b;
+
+    padding: 30px;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.form-box {
+    max-width: 800px;
+
+    margin: 30px auto;
+
+    padding: 30px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 15px rgba(30, 27, 75, 0.08);
+}
+
+.form-box h2 {
+    color: #172554;
+
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #172554;
+
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #c7d2fe;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #172554;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #6d28d9;
+}
+
+
+/* =========================
+   FORM ACTION
+========================= */
+
+.form-action {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 25px;
+}
+
+.button {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: linear-gradient(
+        90deg,
+        #172554,
+        #4c1d95
+    );
+
+    color: white;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+.btn-cancel {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    background: #e0e7ff;
+
+    color: #312e81;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .nav-menu {
+        gap: 2px;
+    }
+
+    .nav-menu a {
+        padding: 8px 9px;
+
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .navbar {
+        height: auto;
+
+        padding: 15px;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
+
+    .header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .btn-tambah {
+        width: 100%;
+
+        text-align: center;
+    }
+}

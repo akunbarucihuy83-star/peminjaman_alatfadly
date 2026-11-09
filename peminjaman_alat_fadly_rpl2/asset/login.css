@@ -1,0 +1,332 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #eef2ff;
+    color: #172554;
+
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   LOGIN CONTAINER
+========================= */
+.login-container {
+    width: 100%;
+    padding: 25px;
+}
+
+/* =========================
+   LOGIN BOX
+========================= */
+.login-box {
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+
+    background: white;
+    border: 1px solid #c7d2fe;
+    border-radius: 15px;
+
+    padding: 35px;
+
+    box-shadow: 0 5px 20px rgba(30, 27, 75, 0.10);
+}
+
+/* =========================
+   LOGO
+========================= */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    font-size: 25px;
+    font-weight: 700;
+
+    color: #172554;
+
+    margin-bottom: 25px;
+}
+
+.logo span {
+    font-size: 30px;
+    color: #c4b5fd;
+}
+
+/* =========================
+   TITLE
+========================= */
+.login-box h2 {
+    text-align: center;
+
+    color: #172554;
+
+    font-size: 25px;
+
+    margin-bottom: 7px;
+}
+
+.subtitle {
+    text-align: center;
+
+    color: #6366a3;
+
+    font-size: 14px;
+
+    margin-bottom: 28px;
+}
+
+/* =========================
+   FORM
+========================= */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+
+    color: #172554;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-bottom: 7px;
+}
+
+.form-group input {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #a5b4fc;
+    border-radius: 8px;
+
+    outline: none;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+
+    color: #172554;
+    background: #f8f7ff;
+
+    transition: 0.3s;
+}
+
+.form-group input::placeholder {
+    color: #8181a8;
+}
+
+.form-group input:focus {
+    border-color: #6d28d9;
+
+    background: white;
+
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.12);
+}
+
+/* =========================
+   LOGIN BUTTON
+========================= */
+.btn-login {
+    width: 100%;
+
+    border: none;
+    border-radius: 9px;
+
+    padding: 12px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #1e3a8a,
+        #6d28d9
+    );
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 5px 14px rgba(49, 46, 129, 0.30);
+
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+
+    background: linear-gradient(
+        135deg,
+        #172554,
+        #4c1d95
+    );
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer-text {
+    text-align: center;
+
+    color: #6366a3;
+
+    font-size: 12px;
+
+    margin-top: 23px;
+}
+
+/* =========================
+   ROLE INFO
+========================= */
+.role-info {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: 15px;
+
+    font-size: 11px;
+    color: #8181a8;
+}
+
+/* =========================
+   RESPONSIVE TABLET
+========================= */
+@media (max-width: 600px) {
+
+    .login-container {
+        padding: 15px;
+    }
+
+    .login-box {
+        max-width: 100%;
+        padding: 30px 25px;
+        border-radius: 12px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    .logo span {
+        font-size: 27px;
+    }
+
+    .login-box h2 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 12px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .btn-login {
+        padding: 11px 15px;
+        font-size: 12px;
+    }
+}
+
+/* =========================
+   HP KECIL
+========================= */
+@media (max-width: 400px) {
+
+    .login-container {
+        padding: 10px;
+    }
+
+    .login-box {
+        padding: 25px 20px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo span {
+        font-size: 24px;
+    }
+
+    .login-box h2 {
+        font-size: 20px;
+    }
+}
+
+/* =========================
+   REGISTER / PESAN
+========================= */
+.register-box {
+    max-width: 450px;
+}
+
+.form-message {
+    padding: 11px 13px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.form-message.success {
+    background: #ecfdf5;
+    border: 1px solid #86efac;
+    color: #166534;
+}
+
+.form-message.error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 17px;
+    color: #6366a3;
+    font-size: 13px;
+}
+
+.register-link a {
+    color: #6d28d9;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .register-box {
+        max-width: 100%;
+    }
+
+    .form-message {
+        font-size: 12px;
+    }
+
+    .register-link {
+        font-size: 12px;
+    }
+}
