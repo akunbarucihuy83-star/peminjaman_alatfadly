@@ -92,10 +92,11 @@ $pesan = $_GET['pesan'] ?? '';
                     <option value="">-- Pilih alat --</option>
                     <?php while ($alat_row = mysqli_fetch_assoc($data_alat)): ?>
                         <?php if ((int)$alat_row['jumlah'] > 0): ?>
-                            <option value="<?= (int)$alat_row['id_alat']; ?>">
+                            <option value="<?= (int)$alat_row['id_alat']; ?>" data-stok="<?= (int)$alat_row['jumlah']; ?>">
                                 <?= htmlspecialchars($alat_row['nama_alat']); ?>
                                 (tersedia: <?= (int)$alat_row['jumlah']; ?>)
                             </option>
+               
                         <?php endif; ?>
                     <?php endwhile; ?>
                 </select>
@@ -103,6 +104,7 @@ $pesan = $_GET['pesan'] ?? '';
             <div class="form-group">
                 <label for="jumlah_pinjam">Jumlah Pinjam</label>
                 <input type="number" id="jumlah_pinjam" name="jumlah_pinjam" min="1" value="1" required>
+                <small id="infoStok" style="display:block;margin-top:6px;color:#64748b;">Pilih alat untuk melihat stok tersedia.</small>
             </div>
 
             <div class="form-group">
@@ -217,6 +219,28 @@ btnBatal.addEventListener('click', function () {
     newLoanWrap.classList.remove('hide');
     riwayatPeminjaman.classList.remove('hide');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Batasi jumlah yang bisa dimasukkan sesuai stok terbaru yang tampil di pilihan alat.
+const pilihAlat = document.getElementById('id_alat');
+const jumlahPinjam = document.getElementById('jumlah_pinjam');
+const infoStok = document.getElementById('infoStok');
+function perbaruiBatasStok() {
+    const option = pilihAlat.options[pilihAlat.selectedIndex];
+    const stok = option ? Number(option.dataset.stok || 0) : 0;
+    if (!pilihAlat.value) {
+        jumlahPinjam.removeAttribute('max');
+        infoStok.textContent = 'Pilih alat untuk melihat stok tersedia.';
+        return;
+    }
+    jumlahPinjam.max = stok;
+    infoStok.textContent = 'Stok tersedia: ' + stok + ' buah.';
+    if (Number(jumlahPinjam.value) > stok) jumlahPinjam.value = stok;
+}
+pilihAlat.addEventListener('change', perbaruiBatasStok);
+jumlahPinjam.addEventListener('input', function () {
+    const max = Number(jumlahPinjam.max || 0);
+    if (max > 0 && Number(jumlahPinjam.value) > max) jumlahPinjam.value = max;
 });
 
 const today = new Date().toISOString().split('T')[0];

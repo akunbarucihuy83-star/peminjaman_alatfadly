@@ -89,73 +89,64 @@ class Peminjaman
     {
         $id_peminjaman = (int) $id_peminjaman;
         $allowed = ['Disetujui', 'Dikembalikan'];
-
         if (!in_array($status, $allowed, true)) {
             die("Status tidak valid.");
         }
 
-        $status_db = mysqli_real_escape_string($this->db, $status);
-
-        $cek = mysqli_query(
-            $this->db,
-            "SELECT id_peminjaman, id_user, id_alat, jumlah_pinjam, status
-             FROM peminjaman
-             WHERE id_peminjaman = $id_peminjaman
-             LIMIT 1"
-        );
-
-        if (!$cek || mysqli_num_rows($cek) !== 1) {
-            die("Data peminjaman tidak ditemukan.");
-        }
-
-        $row = mysqli_fetch_assoc($cek);
-
-        $status_lama = $row['status'] ?? '';
-
-        // Setujui hanya boleh dari status Menunggu.
-        // Kembali hanya boleh untuk peminjaman yang sudah disetujui/dipinjam.
-        if ($status === 'Disetujui' && $status_lama !== 'Menunggu') {
-            die("Peminjaman ini sudah diproses.");
-        }
-
-        if ($status === 'Dikembalikan' && !in_array($status_lama, ['Disetujui', 'Dipinjam'], true)) {
-            die("Peminjaman belum dapat dikembalikan.");
-        }
-
-        $tanggal_kembali_sql = '';
-        if ($status === 'Dikembalikan') {
-            $tanggal_kembali_sql = ", tanggal_kembali = CURDATE()";
-        }
-
-        $ok = mysqli_query(
-            $this->db,
-            "UPDATE peminjaman
-             SET status = '$status_db' $tanggal_kembali_sql
-             WHERE id_peminjaman = $id_peminjaman"
-        );
-
-        if (!$ok) {
-            die("Gagal memperbarui status: " . mysqli_error($this->db));
-        }
-
-        if ($id_petugas > 0) {
-            $log = mysqli_real_escape_string(
+        mysqli_begin_transaction($this->db);
+        try {
+            $cek = mysqli_query(
                 $this->db,
-                "$status peminjaman ID $id_peminjaman"
+                "SELECT id_peminjaman, id_user, id_alat, jumlah_pinjam, status
+                 FROM peminjaman WHERE id_peminjaman = $id_peminjaman
+                 LIMIT 1 FOR UPDATE"
             );
-            $ip = mysqli_real_escape_string(
-                $this->db,
-                $_SERVER['REMOTE_ADDR'] ?? ''
-            );
+            if (!$cek || mysqli_num_rows($cek) !== 1) {
+                throw new Exception("Data peminjaman tidak ditemukan.");
+            }
+            $row = mysqli_fetch_assoc($cek);
+            $status_lama = $row['status'] ?? '';
 
-            mysqli_query(
-                $this->db,
-                "INSERT INTO log_aktivitas (id_user, aktivitas, ip_address)
-                 VALUES ($id_petugas, '$log', '$ip')"
-            );
+            if ($status === 'Disetujui' && $status_lama !== 'Menunggu') {
+                throw new Exception("Peminjaman ini sudah diproses.");
+            }
+            if ($status === 'Dikembalikan' && !in_array($status_lama, ['Disetujui', 'Dipinjam'], true)) {
+                throw new Exception("Peminjaman belum dapat dikembalikan.");
+            }
+
+            // Stok sudah dikurangi saat pengajuan dibuat. Tambahkan kembali hanya saat pengembalian.
+            if ($status === 'Dikembalikan') {
+                $id_alat = (int) $row['id_alat'];
+                $jumlah = (int) $row['jumlah_pinjam'];
+                $stok = mysqli_query($this->db,
+                    "UPDATE alat SET jumlah = jumlah + $jumlah WHERE id_alat = $id_alat");
+                if (!$stok) {
+                    throw new Exception("Gagal mengembalikan stok alat: " . mysqli_error($this->db));
+                }
+            }
+
+            $status_db = mysqli_real_escape_string($this->db, $status);
+            $tanggal_kembali_sql = ($status === 'Dikembalikan') ? ", tanggal_kembali = CURDATE()" : '';
+            $ok = mysqli_query($this->db,
+                "UPDATE peminjaman SET status = '$status_db' $tanggal_kembali_sql
+                 WHERE id_peminjaman = $id_peminjaman");
+            if (!$ok) {
+                throw new Exception("Gagal memperbarui status: " . mysqli_error($this->db));
+            }
+
+            if ($id_petugas > 0) {
+                $log = mysqli_real_escape_string($this->db, "$status peminjaman ID $id_peminjaman");
+                $ip = mysqli_real_escape_string($this->db, $_SERVER['REMOTE_ADDR'] ?? '');
+                mysqli_query($this->db,
+                    "INSERT INTO log_aktivitas (id_user, aktivitas, ip_address)
+                     VALUES ($id_petugas, '$log', '$ip')");
+            }
+            mysqli_commit($this->db);
+            return true;
+        } catch (Exception $e) {
+            mysqli_rollback($this->db);
+            die($e->getMessage());
         }
-
-        return true;
     }
 
     public function getById($id_peminjaman)
@@ -261,50 +252,43 @@ class Peminjaman
         $keperluan = mysqli_real_escape_string($this->db, $keperluan);
         $catatan = mysqli_real_escape_string($this->db, $catatan);
 
-        if ($jumlah_pinjam < 1) {
-            die("Jumlah alat yang dipinjam minimal 1.");
+        if ($id_user <= 0 || $id_alat <= 0 || $jumlah_pinjam < 1) {
+            die("Data peminjaman tidak valid.");
         }
 
-        $cek = mysqli_query(
-            $this->db,
-            "SELECT jumlah, kondisi FROM alat WHERE id_alat = $id_alat LIMIT 1"
-        );
+        // Kurangi stok saat pengajuan dibuat (stok langsung terpesan), secara atomik
+        // agar dua peminjam tidak bisa mengambil stok yang sama.
+        mysqli_begin_transaction($this->db);
+        try {
+            $kurangi = mysqli_query($this->db,
+                "UPDATE alat SET jumlah = jumlah - $jumlah_pinjam
+                 WHERE id_alat = $id_alat AND kondisi <> 'Rusak Berat'
+                   AND jumlah >= $jumlah_pinjam");
+            if (!$kurangi || mysqli_affected_rows($this->db) !== 1) {
+                throw new Exception("Stok alat tidak mencukupi atau alat sedang tidak tersedia. Silakan pilih jumlah yang lebih kecil.");
+            }
 
-        if (!$cek || mysqli_num_rows($cek) !== 1) {
-            die("Alat tidak ditemukan.");
+            $sql = "INSERT INTO peminjaman
+                (id_user, id_alat, jaminan, jumlah_pinjam, tanggal_pinjam, tanggal_kembali, status, keperluan, catatan)
+                VALUES ($id_user, $id_alat, '$jaminan', $jumlah_pinjam, '$tanggal_pinjam', '$tanggal_kembali', 'Menunggu', '$keperluan', '$catatan')";
+            if (!mysqli_query($this->db, $sql)) {
+                throw new Exception("Gagal mengajukan peminjaman: " . mysqli_error($this->db));
+            }
+
+            $log_text = mysqli_real_escape_string($this->db,
+                "Mengajukan peminjaman alat ID $id_alat (jumlah $jumlah_pinjam)");
+            $ip = mysqli_real_escape_string($this->db, $_SERVER['REMOTE_ADDR'] ?? '');
+            mysqli_query($this->db,
+                "INSERT INTO log_aktivitas (id_user, aktivitas, ip_address)
+                 VALUES ($id_user, '$log_text', '$ip')");
+
+            mysqli_commit($this->db);
+            return true;
+        } catch (Exception $e) {
+            mysqli_rollback($this->db);
+            die($e->getMessage());
         }
-
-        $alat = mysqli_fetch_assoc($cek);
-
-        if ($alat['kondisi'] === 'Rusak Berat' || (int) $alat['jumlah'] < $jumlah_pinjam) {
-            die("Jumlah alat tidak mencukupi atau alat sedang tidak tersedia.");
-        }
-
-        $sql = "
-            INSERT INTO peminjaman
-            (id_user, id_alat, jaminan, jumlah_pinjam, tanggal_pinjam, tanggal_kembali, status, keperluan, catatan)
-            VALUES
-            ($id_user, $id_alat, '$jaminan', $jumlah_pinjam, '$tanggal_pinjam', '$tanggal_kembali', 'Menunggu', '$keperluan', '$catatan')
-        ";
-
-        $result = mysqli_query($this->db, $sql);
-
-        if (!$result) {
-            die("Gagal mengajukan peminjaman: " . mysqli_error($this->db));
-        }
-
-        // Simpan aktivitas agar dashboard admin ikut menampilkan pengajuan terbaru.
-        $log_text = mysqli_real_escape_string(
-            $this->db,
-            "Mengajukan peminjaman alat ID $id_alat (jumlah $jumlah_pinjam)"
-        );
-        mysqli_query(
-            $this->db,
-            "INSERT INTO log_aktivitas (id_user, aktivitas, ip_address)
-             VALUES ($id_user, '$log_text', '" . mysqli_real_escape_string($this->db, $_SERVER['REMOTE_ADDR'] ?? '') . "')"
-        );
-
-        return $result;
     }
+
 }
 ?>
